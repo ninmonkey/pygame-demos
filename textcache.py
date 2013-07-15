@@ -147,19 +147,26 @@ class TextWall(object):
 
     def _calc_offset(self):
         # offsets for each line        
-        full = Rect(self.rect)
+        #full = Rect(self.rect)
+        full = self.rect.copy()
         
         prev = Rect(self.rect)
         for t in self.text_lines:            
-            t.rect.topleft = prev.left, prev.bottom
-            prev = t.rect
+            print("  line = ",full)
+            t.rect.topleft = prev.bottomleft
+            prev = t.rect.copy()
             full = full.union(t.rect)
-            print(full,)
 
-        # verify containment
-        #self.rect = Rect(full)
-        #print(full,)
+        # verify containment        
+        print("full.size=", full.size)
+        #print("self.size=", self.rect.size)
+        
+        #bug: this line causes full to increase height every loop
+        #self.rect = full.copy()
+
         if debug: pygame.draw.rect(self.screen, Color("pink"), full, 1)
+        if debug: pygame.draw.rect(self.screen, Color("green"), self.rect, 1)
+
 
     def parse_text(self, text):
         # convert string with "\n" to drawn text        
@@ -239,4 +246,5 @@ class TextWrap(object):
         pass
 
     def draw(self):
+        return
         if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 1)

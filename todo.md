@@ -10,9 +10,11 @@ todo / roadmap
 	exception written bad?
 
 TextWall._calc_offset
-	self.rect not set properly after calc.
-
+	self.rect not set properly after calc. some how rect is continuing
 change font
+
+TextWall._render() 
+	only call _calc_offset if needed
 
 move loaded fonts to module level
 
