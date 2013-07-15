@@ -6,50 +6,35 @@ from pygame.locals import *
 """
 @author: Jacob bolton (2013/07/06)
 @copyright: boilerplate. Use the code for anything.
-@about: started as cleaned up demo for http://www.reddit.com/r/pygame/
 @version: 1.0
-
-== @todo ==
-
-
-question:
-    how to comment properties
-
-@property:
-    font (name)
-        font.match_font('bitstreamverasans') => Vera.ttf
-
-change font
-
-text-list
-text-wall (auto-wraps container)
-global font data (duplicate data in each line atm)
-
-text-wall demo follow mouse, to display auto-wrap
 
 """
 
-debug = False
-
+debug = True
 
 class TextLine(object):
-    # Manage drawing and caching of a single line of text
-    # properties auto-toggle dirty bool as needed
-    """properties:
-    font, font_size:    change loaded font
-    aa: toggle antialiasing
-    rect:   render Rect()
-    color_fg:   color of text
-    color_bg:   None or Color()
-        If background will be a solid color, you can render faster by setting color_bg
+    # Manages drawing and caching of a single line of text
+    # properties will auto-toggle dirty bool as needed
+    """
+    properties:
+        font, font_size:    change loaded font
+        aa: toggle antialiasing
+        rect:   render Rect()
+        color_fg:   color of text
+        color_bg:   None or Color()
 
+        If background is going to be solid color, you can render faster by
+        setting a color_bg to blend AA to.
     """
 
-    def __init__(self, font=None, size=16, text="Hi world"):
+    def __init__(self, font=None, size=16, text="Hi world", color_fg=None):
         self.font_name = font
         self.font_size = size
-        self.color_fg = Color("white")
         self.color_bg = None
+        if color_fg is None:
+            self.color_fg = Color("white")
+        else:
+            self.color_fg = color_fg
 
         self._aa = True
         self._text = text
@@ -93,6 +78,7 @@ class TextLine(object):
 
     @property
     def font_size(self):
+        # Modify font size
         return self._font_size
 
     @font_size.setter
@@ -103,6 +89,7 @@ class TextLine(object):
 
     @property
     def text(self):
+        # Modify text
         return self._text
 
     @text.setter
@@ -112,6 +99,7 @@ class TextLine(object):
 
     @property
     def aa(self):
+        # Modify antialiasing
         return self._aa
 
     @aa.setter
@@ -122,18 +110,30 @@ class TextLine(object):
 
 class TextWall(object):
     # manage multiple TextLine()'s of text / paragraphs.
-    def __init__(self, font=None, size=16):
+    """
+    properties:
+        font, font_size:    change loaded font
+        rect: offset and size as Rect()
+        aa: toggle antialiasing
+        rect:   render Rect()
+        color_fg:   color of text
+        color_bg:   None or Color()
+
+        If background is going to be solid color, you can render faster by
+        setting a color_bg to blend AA to.
+    """
+
+    def __init__(self, font=None, size=16):        
         self.font = font
         self.font_size = size
         self.text_lines = []
         self.aa = True
-        self.offset = Rect(20,20,1,1)
+        self.rect = Rect(0,0,1,1)
 
         self.screen = pygame.display.get_surface()
         self.dirty = True
-        
-        #self._text_raw = "Hello\nWorld!"        
         self.text = "Hello\nWorld!"        
+        
         self._render()
 
     def _render(self):
@@ -147,10 +147,19 @@ class TextWall(object):
 
     def _calc_offset(self):
         # offsets for each line        
-        prev = self.offset
+        full = Rect(self.rect)
+        
+        prev = Rect(self.rect)
         for t in self.text_lines:            
             t.rect.topleft = prev.left, prev.bottom
             prev = t.rect
+            full = full.union(t.rect)
+            print(full,)
+
+        # verify containment
+        #self.rect = Rect(full)
+        #print(full,)
+        if debug: pygame.draw.rect(self.screen, Color("pink"), full, 1)
 
     def parse_text(self, text):
         # convert string with "\n" to drawn text        
@@ -168,11 +177,11 @@ class TextWall(object):
 
     @property
     def font_size(self):
+        # modify font size
         return self._font_size
 
     @font_size.setter
     def font_size(self, size):
-        #todo: I feel the except/else isn't written well?    
         try:
             if self._font_size == size: return
         except AttributeError:
@@ -183,6 +192,7 @@ class TextWall(object):
 
     @property
     def text(self):
+        # Modify and parse new text
         return self._text
 
     @text.setter
@@ -198,6 +208,7 @@ class TextWall(object):
 
     @property
     def aa(self):
+        # Modify antialiasing
         return self._aa
 
     @aa.setter
@@ -212,5 +223,20 @@ class TextWall(object):
 
 class TextWrap(object):
     # probably will replace TextWall completely.
-    def __init__(self):
+    def __init__(self, font=None, size=16, rect_wrap=None, text="", color_fg=None):
+        self.screen = pygame.display.get_surface()
+        if rect_wrap is None:
+            self.rect_wrap = self.screen.get_rect()
+        else:
+            self.rect_wrap = rect_wrap
+
+        if color_fg is None:
+            self.color_fg = Color("white")
+        else:
+            self.color_fg = color_fg
+
+    def parse_text(self, text):
         pass
+
+    def draw(self):
+        if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 1)

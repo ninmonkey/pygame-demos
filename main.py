@@ -22,6 +22,7 @@ class Game():
         
         self.text_wall = TextWall(None, 24)
         self.text_wall.parse_text("Hello world!\nfoo\nbar!")
+        self.text_wall.rect.topleft = (40,50)
         
         self.text_wrap = TextWrap(None, 36)
         self.text_wrap.parse_text(lorem)
@@ -38,6 +39,7 @@ class Game():
         self.screen.fill(bg)                
         self.lines.draw()
         self.text_wall.draw()
+        self.text_wrap.draw()
         pygame.display.update()
 
     def handle_events(self):
@@ -45,7 +47,7 @@ class Game():
             if event.type == pygame.QUIT: self.done = True
             
             elif event.type == MOUSEMOTION:
-                self.text_wall.offset.topleft = event.pos
+                self.text_wrap.rect_wrap.topleft = event.pos
 
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.done = True
