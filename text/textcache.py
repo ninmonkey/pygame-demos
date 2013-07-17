@@ -113,9 +113,10 @@ class TextWall(object):
     """
     properties:
         font, font_size:    change loaded font
-        rect: offset and size as Rect()
+        rect: offset and size of entire wall as Rect()
         aa: toggle antialiasing
         rect:   render Rect()
+        offset: topleft offset to render
         color_fg:   color of text
         color_bg:   None or Color()
 
@@ -129,6 +130,7 @@ class TextWall(object):
         self.text_lines = []
         self.aa = True
         self.rect = Rect(0,0,1,1)
+        self.offset = Rect(0,0,1,1)
 
         self.screen = pygame.display.get_surface()
         self.dirty = True
@@ -146,27 +148,23 @@ class TextWall(object):
         self._calc_offset()
 
     def _calc_offset(self):
-        # offsets for each line        
-        #full = Rect(self.rect)
-        full = self.rect.copy()
-        
-        prev = Rect(self.rect)
-        for t in self.text_lines:            
-            print("  line = ",full)
-            t.rect.topleft = prev.bottomleft
-            prev = t.rect.copy()
-            full = full.union(t.rect)
+        # get offsets for each line and set self.rect
 
+        full = self.offset.copy()
+
+        offset = self.offset.copy()
+        for t in self.text_lines:
+            t.rect.topleft = offset.topleft
+            offset.topleft = t.rect.bottomleft
+            full.width = max(t.rect.width, full.width)
+            full.height += t.rect.height
+
+        self.rect = full
+        
         # verify containment        
-        print("full.size=", full.size)
-        #print("self.size=", self.rect.size)
-        
-        #bug: this line causes full to increase height every loop
-        #self.rect = full.copy()
-
-        if debug: pygame.draw.rect(self.screen, Color("pink"), full, 1)
+        # print("zz full=", full)
+        if debug: pygame.draw.rect(self.screen, Color("pink"), full, 2)
         if debug: pygame.draw.rect(self.screen, Color("green"), self.rect, 1)
-
 
     def parse_text(self, text):
         # convert string with "\n" to drawn text        

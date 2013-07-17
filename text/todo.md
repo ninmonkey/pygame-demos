@@ -1,6 +1,8 @@
 todo / roadmap
 ============
 
+convert to module
+
 @property:
     font (name)
     	first abs name; then abs(match_font()) ; then None;
@@ -15,6 +17,7 @@ change font
 
 TextWall._render() 
 	only call _calc_offset if needed
+	use constructor args instead of extra loop
 
 move loaded fonts to module level
 
