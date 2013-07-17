@@ -1,0 +1,1 @@
+# source: http://stackoverflow.com/questions/17597233/is-there-a-way-that-while-running-pygame-i-can-also-run-the-console-too/17601393#17601393
