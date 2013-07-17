@@ -25,7 +25,7 @@ class Game():
         self.text_wall.parse_text("Hello world!\nfoo\nbar!")
         self.text_wall.offset.topleft = (40,50)
         
-        self.text_wrap = TextWrap(None, 36, Rect(50,50,300,300), "Hi world")
+        self.text_wrap = TextWrap(None, 36, Rect(150,50,300,300), "Hi world")
         self.text_wrap.parse_text(lorem)
 
     def loop(self):
@@ -56,7 +56,7 @@ class Game():
                 elif buttons[2]:
                     self.text_wrap.rect_wrap.width += event.rel[0]
                     self.text_wrap.rect_wrap.height += event.rel[1]
-                                    
+
                 print(self.text_wrap.rect_wrap)
                 print(event.pos)
 

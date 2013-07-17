@@ -144,7 +144,7 @@ class TextWall(object):
         self.text_lines = [ TextLine(self.font, self.font_size, line) for line in self._text_parsed ]
         for t in self.text_lines:
             t.aa = self.aa
-            t.font_size = self.font_size
+            
         self._calc_offset()
 
     def _calc_offset(self):
@@ -228,13 +228,22 @@ class TextWall(object):
 class TextWrap(object):
     """Different than TextWall() in that this auto-wraps text to fit boundry.
     If text is too large/long, it will be truncate.
+    Some duplicate code in TextWall(), may refactor.
     """    
     def __init__(self, font=None, size=16, rect_wrap=None, text="", color_fg=None):
         """
         propertie:
             boundry: Rect() to force text to fit
         """
+        self.dirty = True
         self.screen = pygame.display.get_surface()
+        self.font = font
+        self.color_fg = color_fg
+        self.aa = True
+        self.font_size = size
+
+        self.text = text
+
         if rect_wrap is None:
             self.rect_wrap = self.screen.get_rect()
         else:
@@ -243,10 +252,53 @@ class TextWrap(object):
         if color_fg is None:
             self.color_fg = Color("white")
         else:
-            self.color_fg = color_fg
+            self.color_fg = color_fg    
 
     def parse_text(self, text):
+        # splits string "\n" to drawn text
+        self.dirty = True
+        self._text_raw = text
+        self._text_parsed = self._text_raw.split("\n")
+
+
+    def draw(self, dest=None):
+        self._calc_offset()
+        if dest is None: dest = self.screen
+        if self.dirty or not self.text_lines: self._render()
+        for text in self.text_lines: text.draw(dest)
+
+        if debug: pygame.draw.rect(self.screen, Color("orange"), self.rect, 1)
+        if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 2)
+
+    def _calc_offset(self):
+        # get offsets for each line and set self.rect to container rect
         pass
 
-    def draw(self):
-        if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 1)
+
+    def _render(self):
+        # create cache'd
+        self.dirty = False
+        self.text_lines = [ TextLine(self.font, self.font_size, line, self.color_fg)
+                            for line in self._text_parsed ]
+
+        for t in self.text_lines:
+            t.aa = self.aa
+
+        self.rect = self.rect_wrap.copy()
+
+
+    @property
+    def text(self):
+        # Modify and parse new text
+        return self._text
+
+    @text.setter
+    def text(self, text):
+        try:
+            if self._text_raw == text: return
+        except AttributeError:
+            self._text_raw = text
+
+        self.dirty = True
+        self._text_raw = text
+        self.parse_text(self._text_raw)
