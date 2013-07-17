@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import pygame
 from pygame import *
 from textcache import TextLine, TextWall, TextWrap
@@ -24,7 +25,7 @@ class Game():
         self.text_wall.parse_text("Hello world!\nfoo\nbar!")
         self.text_wall.offset.topleft = (40,50)
         
-        self.text_wrap = TextWrap(None, 36)
+        self.text_wrap = TextWrap(None, 36, Rect(50,50,300,300), "Hi world")
         self.text_wrap.parse_text(lorem)
 
     def loop(self):
@@ -47,7 +48,17 @@ class Game():
             if event.type == pygame.QUIT: self.done = True
             
             elif event.type == MOUSEMOTION:
-                self.text_wrap.rect_wrap.topleft = event.pos
+                # resize TextWrap() boundry
+                buttons = pygame.mouse.get_pressed()
+                if buttons[0]:
+                    self.text_wrap.rect_wrap.left += event.rel[0]
+                    self.text_wrap.rect_wrap.top += event.rel[1]
+                elif buttons[2]:
+                    self.text_wrap.rect_wrap.width += event.rel[0]
+                    self.text_wrap.rect_wrap.height += event.rel[1]
+                                    
+                print(self.text_wrap.rect_wrap)
+                print(event.pos)
 
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.done = True

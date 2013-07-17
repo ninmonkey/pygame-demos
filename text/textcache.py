@@ -163,7 +163,6 @@ class TextWall(object):
         
         # verify containment        
         # print("zz full=", full)
-        if debug: pygame.draw.rect(self.screen, Color("pink"), full, 2)
         if debug: pygame.draw.rect(self.screen, Color("green"), self.rect, 1)
 
     def parse_text(self, text):
@@ -227,8 +226,14 @@ class TextWall(object):
         self._aa = aa    
 
 class TextWrap(object):
-    # probably will replace TextWall completely.
+    """Different than TextWall() in that this auto-wraps text to fit boundry.
+    If text is too large/long, it will be truncate.
+    """    
     def __init__(self, font=None, size=16, rect_wrap=None, text="", color_fg=None):
+        """
+        propertie:
+            boundry: Rect() to force text to fit
+        """
         self.screen = pygame.display.get_surface()
         if rect_wrap is None:
             self.rect_wrap = self.screen.get_rect()
@@ -244,5 +249,4 @@ class TextWrap(object):
         pass
 
     def draw(self):
-        return
         if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 1)
