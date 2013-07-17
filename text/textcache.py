@@ -232,7 +232,7 @@ class TextWrap(object):
     """    
     def __init__(self, font=None, size=16, rect_wrap=None, text="", color_fg=None):
         """
-        propertie:
+        properties:
             boundry: Rect() to force text to fit
         """
         self.dirty = True
@@ -241,6 +241,7 @@ class TextWrap(object):
         self.color_fg = color_fg
         self.aa = True
         self.font_size = size
+        self.text_lines = []
 
         self.text = text
 
@@ -267,26 +268,38 @@ class TextWrap(object):
         if self.dirty or not self.text_lines: self._render()
         for text in self.text_lines: text.draw(dest)
 
-        if debug: pygame.draw.rect(self.screen, Color("orange"), self.rect, 1)
         if debug: pygame.draw.rect(self.screen, Color("darkred"), self.rect_wrap, 2)
+        if debug: pygame.draw.rect(self.screen, Color("orange"), self.rect, 1)
 
     def _calc_offset(self):
         # get offsets for each line and set self.rect to container rect
-        pass
+        #if not self.text_lines: return
+        full = self.rect_wrap.copy()
+        full.size = (0,0)        
+        prev = full.copy()
 
+        for t in self.text_lines:
+            t.rect.topleft = prev.topleft
+            prev.topleft = t.rect.bottomleft
+            full.width = max(t.rect.width, full.width)
+            full.height += t.rect.height
 
+        # full size of (render) maybe be smaller than boundry rect
+        self.rect = full
+        
     def _render(self):
         # create cache'd
         self.dirty = False
+        
+        #actually test each word if it will fit.
+        #
+
         self.text_lines = [ TextLine(self.font, self.font_size, line, self.color_fg)
                             for line in self._text_parsed ]
 
         for t in self.text_lines:
             t.aa = self.aa
-
-        self.rect = self.rect_wrap.copy()
-
-
+            
     @property
     def text(self):
         # Modify and parse new text
@@ -302,3 +315,48 @@ class TextWrap(object):
         self.dirty = True
         self._text_raw = text
         self.parse_text(self._text_raw)
+
+    @property
+    def rect_wrap(self):
+        # set Rect() boundry for text wrapping
+        return self._rect_wrap
+
+    @rect_wrap.setter
+    def rect_wrap(self, wrap):
+        try:
+            if self._rect_wrap == wrap: return
+        except AttributeError:
+            self._rect_wrap = wrap
+
+        self.dirty = True        
+        self.parse_text(self._text_raw)
+
+    @property
+    def font_size(self):
+        # modify font size
+        return self._font_size
+
+    @font_size.setter
+    def font_size(self, size):
+        try:
+            if self._font_size == size: return
+        except AttributeError:
+            self._font_size = size
+
+        self.dirty = True
+        self._font_size = size
+
+    @property
+    def aa(self):
+        # Modify antialiasing
+        return self._aa
+
+    @aa.setter
+    def aa(self, aa):
+        try:
+            if self._aa == aa: return
+        except AttributeError:
+            self._aa = aa
+
+        self.dirty = True
+        self._aa = aa    
