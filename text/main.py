@@ -44,7 +44,8 @@ class Game():
 
     def handle_events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: self.done = True
+            if event.type == pygame.QUIT:
+                self.done = True
             
             elif event.type == MOUSEMOTION:
                 # resize TextWrap() boundry
@@ -56,8 +57,8 @@ class Game():
                     self.text_wrap.rect_wrap.width += event.rel[0]
                     self.text_wrap.rect_wrap.height += event.rel[1]
 
-                print(self.text_wrap.rect_wrap)
-                print(event.pos)
+                #print(self.text_wrap.rect_wrap)
+                #print(event.pos)
 
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.done = True

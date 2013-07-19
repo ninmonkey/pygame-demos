@@ -56,7 +56,7 @@ class TextLine(object):
 
     def _render(self):
         # create cache'd surface        
-        if debug: print('_render()')
+        #if debug: print('TextLine()._render()')
 
         self.dirty = False
         if not self.color_bg:
@@ -261,7 +261,6 @@ class TextWrap(object):
         self._text_raw = text
         self._text_parsed = self._text_raw.split("\n")
 
-
     def draw(self, dest=None):
         self._calc_offset()
         if dest is None: dest = self.screen
@@ -295,11 +294,26 @@ class TextWrap(object):
         #
 
         self.text_lines = [ TextLine(self.font, self.font_size, line, self.color_fg)
-                            for line in self._text_parsed ]
+                            for line in self._fit_text() ]
+                            #for line in self._text_parsed ]
 
         for t in self.text_lines:
             t.aa = self.aa
-            
+        
+    def _fit_text(self):
+        # now fit text
+        text = []
+        cur = self._text_parsed
+        
+        print("-")
+        for t in cur:
+            text.append(t)
+            #TODO HERE
+            #if t.font.size()
+            #if cur.font.size(cur.)
+        
+        return text
+
     @property
     def text(self):
         # Modify and parse new text

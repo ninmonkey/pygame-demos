@@ -1,6 +1,10 @@
 todo / roadmap
 ============
 
+global fonts so _fit_text() can call font.size() on non-existed TextLine()
+
+
+
 convert to module
 
 
